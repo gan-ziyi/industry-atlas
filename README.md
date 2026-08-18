@@ -2,7 +2,17 @@
 
 Industry Atlas 是一个以产业链为核心的本地研究工作台。它帮助研究者逐层拆解产业结构、维护节点研究卡片、整理公司映射，并利用 DeepSeek 辅助分析年报和生成可审核的产业图谱修改建议。
 
-> 当前仓库提供源码和本地开发运行方式。面向普通用户的 Windows 安装包仍在整理中；安装包发布后，用户无需安装 Python 或 Node.js。
+> 普通用户可以从 [GitHub Releases](https://github.com/gan-ziyi/industry-atlas/releases) 下载 Windows 安装包，无需安装 Python 或 Node.js。
+
+## 普通用户安装
+
+1. 打开 [Releases 下载页](https://github.com/gan-ziyi/industry-atlas/releases)；
+2. 下载最新的 `IndustryAtlas-Setup-版本号-x64.exe`；
+3. 双击安装并保留“创建桌面快捷方式”；
+4. 启动后点击左下角“系统设置”，填写自己的 DeepSeek API Key；
+5. 使用“本机使用”进入个人研究空间。
+
+每位用户的数据保存在自己的 `%LOCALAPPDATA%\IndustryAtlas` 目录，彼此不会互通。卸载应用不会主动删除研究数据。
 
 ## 核心能力
 
@@ -85,4 +95,4 @@ npm run build
 
 ## 当前状态
 
-项目处于可运行的本地产品原型阶段。正式公开发布前仍计划补充 Windows 安装程序、首次启动引导、用户自行配置 DeepSeek Key 的界面，以及更完整的自动更新和数据恢复流程。
+项目处于可运行的本地产品原型阶段，已经提供 Windows 安装程序和用户自行配置 DeepSeek Key 的界面。后续仍计划补充更完整的首次启动引导、自动更新和数据恢复流程。

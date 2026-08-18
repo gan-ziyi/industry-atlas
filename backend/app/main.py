@@ -15,12 +15,12 @@ from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import Response
 
 from .auth import CurrentUser, hash_password, issue_token, require_user, require_workspace_role, verify_password
-from .config import settings
+from .config import save_desktop_ai_settings, settings
 from .db import connection, init_db, json_dump, json_load, row_dict, utc_now
 from .documents import extract_pdf, ocr_pdf
 from .extraction import extraction_response, run_document_extraction
 from .exports import build_export
-from .schemas import AccountLoginRequest, AccountRegisterRequest, CompanyMasterSyncRequest, DeepSeekRequest, DevLoginRequest, DocumentExtractionRequest, LegacyImportRequest, ProjectCreate, ProjectUpdate, WechatBindRequest, WechatLoginRequest, WorkspaceCreate, WorkspaceMemberAdd, WorkspaceMemberUpdate
+from .schemas import AccountLoginRequest, AccountRegisterRequest, CompanyMasterSyncRequest, DeepSeekRequest, DesktopSettingsUpdate, DevLoginRequest, DocumentExtractionRequest, LegacyImportRequest, ProjectCreate, ProjectUpdate, WechatBindRequest, WechatLoginRequest, WorkspaceCreate, WorkspaceMemberAdd, WorkspaceMemberUpdate
 
 
 @asynccontextmanager
@@ -100,6 +100,31 @@ def merge_company_data(existing: dict[str, Any], incoming: dict[str, Any]) -> di
 @app.get("/api/health")
 def health() -> dict[str, str]:
     return {"status": "ok", "service": "industry-atlas-api"}
+
+
+@app.get("/api/local-settings")
+def get_local_settings() -> dict[str, Any]:
+    if settings.app_env.lower() != "desktop":
+        raise HTTPException(status_code=404, detail="本机设置接口仅在桌面版中可用")
+    return {
+        "configured": bool(settings.deepseek_api_key),
+        "base_url": settings.deepseek_base_url,
+        "model": settings.deepseek_model,
+    }
+
+
+@app.put("/api/local-settings")
+def update_local_settings(payload: DesktopSettingsUpdate) -> dict[str, Any]:
+    if settings.app_env.lower() != "desktop":
+        raise HTTPException(status_code=404, detail="本机设置接口仅在桌面版中可用")
+    if not payload.base_url.startswith(("https://", "http://127.0.0.1", "http://localhost")):
+        raise HTTPException(status_code=422, detail="模型地址必须使用 HTTPS；仅本机地址可使用 HTTP")
+    save_desktop_ai_settings(payload.api_key, payload.base_url, payload.model)
+    return {
+        "configured": bool(settings.deepseek_api_key),
+        "base_url": settings.deepseek_base_url,
+        "model": settings.deepseek_model,
+    }
 
 
 @app.get("/api/ready")

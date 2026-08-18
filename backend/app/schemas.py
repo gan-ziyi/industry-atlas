@@ -71,6 +71,12 @@ class DeepSeekRequest(BaseModel):
     thinking: bool = True
 
 
+class DesktopSettingsUpdate(BaseModel):
+    api_key: str | None = Field(default=None, max_length=512)
+    base_url: str = Field(default="https://api.deepseek.com", min_length=8, max_length=500)
+    model: str = Field(default="deepseek-v4-flash", min_length=1, max_length=120)
+
+
 class DocumentExtractionRequest(BaseModel):
     model: Literal["deepseek-v4-flash", "deepseek-v4-pro"] | None = None
     focus: str = Field(default="提取公司业务、产品、收入、产能、客户、产业位置和主要风险", max_length=500)

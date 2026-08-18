@@ -28,6 +28,10 @@ web/*.tsbuildinfo
 web/vite.config.js
 web/vite.config.d.ts
 web/desktop-smoke.png
+/build/
+/dist/
+/packaging/output/
+/packaging/package-settings-smoke.png
 
 # Mini Program local settings
 **/project.private.config.json

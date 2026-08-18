@@ -337,3 +337,25 @@ def test_finding_citations_are_checked_against_exact_pages() -> None:
     assert result["validation"] == {"total": 2, "matched": 1, "unmatched": 1}
     assert result["findings"][0]["citation_status"] == "matched"
     assert result["findings"][1]["citation_status"] == "unmatched"
+
+
+def test_desktop_ai_settings_are_saved_locally(monkeypatch) -> None:
+    from app.config import settings
+
+    settings_path = TEST_DATA_DIR / "desktop-settings.json"
+    monkeypatch.setattr(settings, "app_env", "desktop")
+    monkeypatch.setattr(settings, "desktop_settings_path", settings_path)
+    monkeypatch.setattr(settings, "deepseek_api_key", "")
+    monkeypatch.setattr(settings, "deepseek_base_url", "https://api.deepseek.com")
+    monkeypatch.setattr(settings, "deepseek_model", "deepseek-v4-flash")
+    with TestClient(app) as client:
+        before = client.get("/api/local-settings")
+        assert before.status_code == 200
+        assert before.json()["configured"] is False
+        saved = client.put(
+            "/api/local-settings",
+            json={"api_key": "unit-test-key", "base_url": "https://api.deepseek.com", "model": "deepseek-chat"},
+        )
+        assert saved.status_code == 200
+        assert saved.json() == {"configured": True, "base_url": "https://api.deepseek.com", "model": "deepseek-chat"}
+    assert '"api_key": "unit-test-key"' in settings_path.read_text(encoding="utf-8")

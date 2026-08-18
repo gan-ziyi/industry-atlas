@@ -37,6 +37,21 @@ export function storageScope() {
 
 export async function checkHealth() { return request<{ status: string; service: string }>('/api/health') }
 
+export interface LocalAISettings {
+  configured: boolean
+  base_url: string
+  model: string
+}
+
+export async function getLocalAISettings() { return request<LocalAISettings>('/api/local-settings', {}, false) }
+
+export async function updateLocalAISettings(input: { apiKey?: string; baseUrl: string; model: string }) {
+  return request<LocalAISettings>('/api/local-settings', {
+    method: 'PUT',
+    body: JSON.stringify({ api_key: input.apiKey || null, base_url: input.baseUrl, model: input.model }),
+  }, false)
+}
+
 export async function devLogin(displayName: string): Promise<CloudWorkspace> {
   const response = await fetch(`${backendUrl()}/api/auth/dev-login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ display_name: displayName, device_key: desktopDeviceKey() }) })
   const payload = await response.json()
