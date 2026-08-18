@@ -1,0 +1,6 @@
+import { Clock3, RotateCcw, Save, Trash2 } from 'lucide-react'
+import type { ProjectSnapshot } from '../types'
+
+export function SnapshotManager({ snapshots, onCreate, onRestore, onDelete }: { snapshots: ProjectSnapshot[]; onCreate: () => void; onRestore: (snapshot: ProjectSnapshot) => void; onDelete: (id: string) => void }) {
+  return <section className="workspace-page"><div className="page-heading"><div><span>VERSION HISTORY</span><h2>研究快照与恢复</h2><p>节点编辑、文件写入和 AI 审核前后都可以保留恢复点。</p></div><button className="page-action" onClick={onCreate}><Save size={15} />创建当前快照</button></div><div className="snapshot-timeline">{snapshots.map(snapshot => <article key={snapshot.id}><span><Clock3 size={16} /></span><div><strong>{snapshot.label}</strong><p>{new Date(snapshot.createdAt).toLocaleString('zh-CN')} · {Object.keys(snapshot.state.nodes).length} 个节点 · {snapshot.state.companyData.length} 家公司</p></div><button onClick={() => onRestore(snapshot)}><RotateCcw size={13} />恢复</button><button className="danger" onClick={() => onDelete(snapshot.id)}><Trash2 size={13} /></button></article>)}{!snapshots.length && <div className="page-empty hero"><Clock3 size={28} /><strong>还没有正式版快照</strong><p>创建快照后，可以在不影响旧原型数据的情况下恢复研究项目。</p></div>}</div></section>
+}

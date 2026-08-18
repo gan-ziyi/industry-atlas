@@ -1,0 +1,14 @@
+import { Trash2, X } from 'lucide-react'
+import { useState } from 'react'
+import type { ProjectState, ResearchTask } from '../types'
+
+export function TaskEditor({ state, task, defaultNodeId, onClose, onSave, onDelete }: { state: ProjectState; task?: ResearchTask; defaultNodeId: string; onClose: () => void; onSave: (task: ResearchTask) => void; onDelete?: () => void }) {
+  const [title, setTitle] = useState(task?.title || `完善“${state.nodes[defaultNodeId]?.title}”的产业研究`)
+  const [nodeId, setNodeId] = useState(task?.nodeId || defaultNodeId)
+  const [type, setType] = useState<ResearchTask['type']>(task?.type || 'evidence')
+  const [priority, setPriority] = useState<ResearchTask['priority']>(task?.priority || 'medium')
+  const [status, setStatus] = useState<ResearchTask['status']>(task?.status || 'todo')
+  const [note, setNote] = useState(task?.note || '')
+  const submit = (event: React.FormEvent) => { event.preventDefault(); onSave({ id: task?.id || `task-${Date.now()}`, title: title.trim(), nodeId, type, priority, status, note }) }
+  return <div className="formal-modal"><form className="task-editor" onSubmit={submit}><header><div><span>RESEARCH TASK</span><h2>{task ? '编辑研究任务' : '新建研究任务'}</h2></div><button type="button" onClick={onClose}><X size={17} /></button></header><div className="task-form"><label className="full"><span>任务标题</span><input required value={title} onChange={event => setTitle(event.target.value)} /></label><label><span>关联节点</span><select value={nodeId} onChange={event => setNodeId(event.target.value)}>{Object.values(state.nodes).map(node => <option value={node.id} key={node.id}>{node.title}</option>)}</select></label><label><span>任务类型</span><select value={type} onChange={event => setType(event.target.value as ResearchTask['type'])}><option value="structure">产业拆解</option><option value="explain">解释完善</option><option value="evidence">寻找证据</option><option value="verify">人工核验</option><option value="update">信息更新</option></select></label><label><span>优先级</span><select value={priority} onChange={event => setPriority(event.target.value as ResearchTask['priority'])}><option value="high">高</option><option value="medium">中</option><option value="low">低</option></select></label><label><span>状态</span><select value={status} onChange={event => setStatus(event.target.value as ResearchTask['status'])}><option value="todo">待处理</option><option value="doing">进行中</option><option value="done">已完成</option></select></label><label className="full"><span>研究要求与完成标准</span><textarea rows={5} value={note} onChange={event => setNote(event.target.value)} /></label></div><footer>{onDelete ? <button type="button" className="danger" onClick={onDelete}><Trash2 size={13} />删除任务</button> : <span>任务会跟随当前项目同步和导出。</span>}<div><button type="button" onClick={onClose}>取消</button><button type="submit" className="primary">保存任务</button></div></footer></form></div>
+}

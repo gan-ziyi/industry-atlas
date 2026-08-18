@@ -1,0 +1,39 @@
+{
+  "appid": "wxd88141b59c0e7e04",
+  "projectname": "industry-atlas-mini",
+  "description": "Industry Atlas 产业研究工作台微信小程序",
+  "miniprogramRoot": "./",
+  "compileType": "miniprogram",
+  "setting": {
+    "useCompilerPlugins": false,
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": true,
+    "urlCheck": false,
+    "minifyWXML": true,
+    "compileWorklet": false,
+    "uglifyFileName": false,
+    "uploadWithSourceMap": true,
+    "packNpmManually": false,
+    "packNpmRelationList": [],
+    "minifyWXSS": true,
+    "localPlugins": false,
+    "disableUseStrict": false,
+    "condition": false,
+    "swc": false,
+    "disableSWC": true,
+    "babelSetting": {
+      "ignore": [],
+      "disablePlugins": [],
+      "outputPath": ""
+    }
+  },
+  "simulatorPluginLibVersion": {},
+  "packOptions": {
+    "ignore": [],
+    "include": []
+  },
+  "editorSetting": {},
+  "libVersion": "2.31.0"
+}

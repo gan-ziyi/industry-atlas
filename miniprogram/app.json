@@ -1,0 +1,37 @@
+{
+  "pages": [
+    "pages/login/index",
+    "pages/projects/index",
+    "pages/graph/index",
+    "pages/ai-review/index",
+    "pages/companies/index",
+    "pages/members/index",
+    "pages/node/index",
+    "pages/materials/index",
+    "pages/extraction/index",
+    "pages/tasks/index",
+    "pages/settings/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "Industry Atlas",
+    "navigationBarBackgroundColor": "#101827",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f4f6f9",
+    "backgroundTextStyle": "light"
+  },
+  "tabBar": {
+    "color": "#8993a3",
+    "selectedColor": "#6558d5",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      { "pagePath": "pages/projects/index", "text": "项目" },
+      { "pagePath": "pages/graph/index", "text": "产业链" },
+      { "pagePath": "pages/materials/index", "text": "资料" },
+      { "pagePath": "pages/tasks/index", "text": "任务" },
+      { "pagePath": "pages/settings/index", "text": "设置" }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

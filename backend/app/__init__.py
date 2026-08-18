@@ -1,0 +1,1 @@
+"""Industry Atlas backend package."""

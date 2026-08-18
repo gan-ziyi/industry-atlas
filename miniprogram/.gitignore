@@ -1,0 +1,5 @@
+project.private.config.json
+node_modules/
+.npm-cache/
+npm-debug.log*
+e2e-artifacts/

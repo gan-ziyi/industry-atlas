@@ -1,0 +1,12 @@
+<view class="page extraction-page">
+  <text class="eyebrow">AI EXTRACTION REVIEW</text><text class="page-title">年报发现审核</text><text class="page-subtitle">{{filename}} · 只有勾选的发现会写入研究项目。</text>
+  <view wx:if="{{loading}}" class="processing card"><view class="spinner"></view><text>正在分析年报</text><text>{{message}}</text></view>
+  <view wx:elif="{{message}}" class="feedback">{{message}}</view>
+  <block wx:if="{{task && task.status==='ready'}}">
+    <view class="result-summary card"><view><text class="company">{{task.result.company||'公司名称未识别'}}</text><text>{{task.result.report_period}} · {{task.result.summary}}</text></view><view><text>{{task.result.validation.matched}}</text><text>原文匹配</text></view></view>
+    <view class="target card"><text>写入产业节点</text><picker mode="selector" range="{{nodeNames}}" value="{{nodeIndex}}" bindchange="chooseNode"><view>{{nodeNames[nodeIndex]}} ›</view></picker></view>
+    <view class="review-tools"><text>选择发现 · {{findings.length}}</text><button bindtap="selectMatched">只选原文匹配</button></view>
+    <view class="finding-list"><view wx:for="{{findings}}" wx:key="id" class="finding card {{item.selected?'selected':''}} {{item.citation_status}}" data-id="{{item.id}}" bindtap="toggle"><checkbox checked="{{item.selected}}" color="#6558d5"/><view><view class="finding-head"><text>{{item.category_label||item.category}}</text><text class="citation">{{item.citationLabel}}</text></view><text class="finding-title">{{item.title}}</text><text class="finding-value">{{item.value}}</text><text class="finding-quote">{{item.quote||'未提供原文摘录'}}</text><text class="finding-page">{{item.pageLabel}}</text></view></view></view>
+    <button class="accept primary" bindtap="accept">写入选中发现</button>
+  </block>
+</view>

@@ -1,0 +1,14 @@
+<view class="login-page">
+  <view class="login-hero"><view class="brand-mark">✦</view><text class="brand-name">Industry Atlas</text><text class="brand-cn">产业研究工作台 · 小程序版</text></view>
+  <view class="login-card card">
+    <text class="eyebrow">RESEARCH WORKSPACE</text><text class="login-title">进入你的研究空间</text><text class="login-desc">项目、产业链、证据与研究任务和 Web 端保持一致。</text>
+    <view class="mode-tabs"><button data-mode="local" class="{{mode==='local'?'active':''}}" bindtap="setMode">本地体验</button><button data-mode="wechat" class="{{mode==='wechat'?'active':''}}" bindtap="setMode">微信登录</button><button data-mode="email" class="{{mode==='email'?'active':''}}" bindtap="setMode">邮箱登录</button></view>
+    <view class="field"><text>后端地址</text><input value="{{baseUrl}}" data-field="baseUrl" bindinput="field" placeholder="https://api.example.com"/><button bindtap="saveServer">保存</button></view>
+    <block wx:if="{{mode==='local'}}"><view class="field simple"><text>研究员名称</text><input value="{{displayName}}" data-field="displayName" bindinput="field"/></view><view class="safe-note">本地体验仅用于当前电脑调试，不需要正式 AppID，也不会消耗 AI 额度。</view></block>
+    <block wx:elif="{{mode==='wechat'}}"><view class="field simple"><text>显示名称</text><input value="{{displayName}}" data-field="displayName" bindinput="field"/></view><view class="safe-note">微信登录只把临时 code 发送给你的后端；AppSecret 不进入小程序。</view></block>
+    <block wx:else><view class="field simple"><text>邮箱</text><input type="text" value="{{email}}" data-field="email" bindinput="field" placeholder="researcher@example.com"/></view><view class="field simple"><text>密码{{emailAction==='register'?'（至少 10 位）':''}}</text><input password value="{{password}}" data-field="password" bindinput="field"/></view><block wx:if="{{emailAction==='register'}}"><view class="field simple"><text>研究员名称</text><input value="{{displayName}}" data-field="displayName" bindinput="field"/></view><view class="field simple"><text>研究空间名称</text><input value="{{workspaceName}}" data-field="workspaceName" bindinput="field"/></view></block><button class="email-toggle" bindtap="toggleEmailAction">{{emailAction==='login'?'没有账号？创建研究空间':'已有账号？返回登录'}}</button></block>
+    <view wx:if="{{message}}" class="feedback">{{message}}</view>
+    <button class="login-button primary" loading="{{busy}}" bindtap="login">{{mode==='local'?'立即进入工作台':(mode==='wechat'?'微信快捷登录':(emailAction==='register'?'创建账号并进入':'登录研究空间'))}}</button>
+  </view>
+  <text class="login-foot">AI 请求统一经过研究工作台后端，不在小程序中保存模型密钥。</text>
+</view>

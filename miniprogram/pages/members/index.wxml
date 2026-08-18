@@ -1,0 +1,7 @@
+<view class="page member-page" wx:if="{{session}}">
+  <text class="eyebrow">TEAM ACCESS</text><text class="page-title">成员与权限</text><text class="page-subtitle">{{session.workspace.name}} · 权限作用于整个研究空间。</text>
+  <view wx:if="{{session.workspace.role==='owner'}}" class="invite card"><text class="section-title">邀请已注册账号</text><input value="{{email}}" bindinput="emailInput" placeholder="成员邮箱"/><picker mode="selector" range="{{roles}}" value="{{roleIndex}}" bindchange="rolePick"><view>{{roles[roleIndex]}} ›</view></picker><button class="primary" loading="{{busy}}" disabled="{{!email||busy}}" bindtap="add">添加成员</button></view>
+  <view wx:else class="readonly-banner">只有空间所有者可以邀请、移除成员或调整权限。</view>
+  <view wx:if="{{message}}" class="feedback">{{message}}</view>
+  <view class="member-list"><view wx:for="{{members}}" wx:key="id" class="member card"><view class="avatar">{{item.avatar}}</view><view class="member-main"><text class="member-name">{{item.display_name}}</text><text class="member-email">{{item.email||'微信账号'}}</text></view><text wx:if="{{item.role==='owner'}}" class="pill">所有者</text><picker wx:elif="{{session.workspace.role==='owner'}}" mode="selector" range="{{roles}}" value="{{item.roleIndex}}" data-id="{{item.id}}" bindchange="changeRole"><view class="role-picker">{{item.roleLabel}} ›</view></picker><text wx:else class="pill">{{item.roleLabel}}</text><button wx:if="{{session.workspace.role==='owner'&&item.role!=='owner'}}" class="danger" data-id="{{item.id}}" bindtap="remove">移除</button></view></view>
+</view>

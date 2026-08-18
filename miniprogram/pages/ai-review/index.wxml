@@ -1,0 +1,14 @@
+<view class="page ai-page">
+  <text class="eyebrow">AI CHANGE REVIEW</text><text class="page-title">AI 修改产业地图</text><text class="page-subtitle">先生成修改建议，再逐项审核。AI 不会直接覆盖当前项目。</text>
+  <view class="prompt card"><text class="section-title">你希望怎么修改？</text><textarea value="{{instruction}}" bindinput="input" maxlength="1000" placeholder="例如：继续拆解芯片制造环节，补充设备、材料和关键瓶颈；不要添加公司。"/><button class="primary" loading="{{loading}}" disabled="{{!instruction||loading}}" bindtap="generate">✦ 生成修改建议</button></view>
+  <view wx:if="{{message}}" class="feedback">{{message}}</view>
+  <checkbox-group wx:if="{{patches.length}}" bindchange="selection" class="patch-list">
+    <label wx:for="{{patches}}" wx:key="key" class="patch card">
+      <view class="patch-head"><checkbox value="{{item.key}}" checked="{{item.checked}}" color="#6558d5"/><view><text class="patch-title">{{item.title}}</text><text class="patch-scope">{{item.scope}}</text></view></view>
+      <view class="change before"><text>修改前</text><text>{{item.before}}</text></view>
+      <view class="change after"><text>修改后</text><text>{{item.after}}</text></view>
+      <view class="reason"><text>AI 理由</text><text>{{item.reason}}</text></view>
+    </label>
+  </checkbox-group>
+  <view wx:if="{{patches.length}}" class="review-bar"><text>已选择 {{selected.length}} / {{patches.length}} 项</text><button class="primary" loading="{{applying}}" disabled="{{!selected.length||applying}}" bindtap="apply">审核并应用</button></view>
+</view>

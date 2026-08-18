@@ -1,0 +1,48 @@
+# Secrets and local configuration
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.*.example
+*.pem
+*.key
+
+# Local research data
+backend/data/
+desktop-data-backups/
+*.db
+*.sqlite
+*.sqlite3
+
+# Python
+**/.venv/
+**/__pycache__/
+**/.pytest_cache/
+*.py[cod]
+.coverage
+htmlcov/
+
+# Node and frontend build output
+**/node_modules/
+web/dist/
+web/*.tsbuildinfo
+web/vite.config.js
+web/vite.config.d.ts
+web/desktop-smoke.png
+
+# Mini Program local settings
+**/project.private.config.json
+
+# Logs, archives and temporary artifacts
+*.log
+*.zip
+*.tmp
+*.bak
+*.swp
+~$*
+
+# Editors and operating systems
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+desktop.ini

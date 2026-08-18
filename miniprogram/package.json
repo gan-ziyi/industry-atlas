@@ -1,0 +1,7 @@
+{
+  "name": "industry-atlas-miniprogram",
+  "private": true,
+  "scripts": {
+    "check": "node check.mjs && node runtime-check.mjs"
+  }
+}

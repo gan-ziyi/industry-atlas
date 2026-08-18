@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>行业图谱 · 产业研究工作台</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">I</div>
+          <div><strong>Industry Atlas</strong><span>产业研究工作台</span></div>
+        </div>
+
+        <nav class="main-nav" aria-label="主导航">
+          <button class="nav-item active" data-nav="graph"><span>⌘</span>研究图谱</button>
+          <button class="nav-item" data-nav="dashboard"><span>▦</span>研究看板</button>
+          <button class="nav-item" data-nav="library"><span>▤</span>资料库</button>
+          <button class="nav-item" data-nav="companies"><span>▣</span>公司库</button>
+          <button class="nav-item" data-nav="snapshots"><span>◫</span>研究快照</button>
+        </nav>
+
+        <div class="sidebar-section">
+          <div class="section-title"><span>我的研究</span><button id="newResearch" title="新建产业研究">＋</button></div>
+          <button class="project active" data-project-id="ai-compute"><i class="project-dot violet"></i><span>AI 算力产业链<small>18 个节点 · 刚刚更新</small></span></button>
+          <button class="project" data-seed="人形机器人"><i class="project-dot blue"></i><span>人形机器人<small>点击生成演示项目</small></span></button>
+          <button class="project" data-seed="创新药"><i class="project-dot green"></i><span>创新药产业链<small>点击生成演示项目</small></span></button>
+        </div>
+
+        <div class="sidebar-footer">
+          <div class="sync-row" id="cloudStatus"><span class="sync-dot"></span><span>本地修改已保存</span></div>
+          <button class="profile" id="workspaceProfile"><span class="avatar">G</span><span>个人研究空间<small>本地工作区</small></span><b>•••</b></button>
+        </div>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div class="crumbs"><span>研究图谱</span><b>/</b><strong>AI 算力产业链</strong><button class="title-menu" id="projectMenuToggle">⌄</button>
+            <div class="dropdown-menu project-dropdown" id="projectMenu"><button id="renameProject">✎ 重命名项目</button><button id="duplicateProject">▣ 复制为新项目</button><button id="generateReportMenu">▤ 生成研究报告</button><button id="exportProjectMenu">⇩ 导出项目备份</button><i></i><button class="danger" id="deleteProject">删除当前项目</button></div>
+          </div>
+          <div class="top-actions">
+            <div class="mode-switch" role="tablist" aria-label="工作模式">
+              <button class="mode active" data-mode="browse">浏览</button>
+              <button class="mode" data-mode="edit">编辑</button>
+              <button class="mode ai-mode" data-mode="review"><i></i>AI 审阅 <span>4</span></button>
+            </div>
+            <button class="icon-button" id="undoAction" title="撤销上一次内容修改">↶</button>
+            <button class="icon-button" id="aiSettingsOpen" title="AI 接口设置">⚙</button>
+            <button class="primary-button" id="aiOpen">✦ AI 研究</button>
+          </div>
+        </header>
+
+        <section class="contextbar">
+          <div class="search-wrap"><span>⌕</span><input id="graphSearch" placeholder="搜索节点、概念或研究结论" /><kbd>⌘ K</kbd></div>
+          <div class="context-actions">
+            <button class="filter active" data-filter="all">全部关系</button>
+            <button class="filter" data-filter="supply">供应</button>
+            <button class="filter" data-filter="depend">依赖</button>
+            <button class="filter" data-filter="constraint">制约</button>
+            <button class="icon-button small" id="focusBtn" title="聚焦已选节点">◎</button>
+          </div>
+        </section>
+
+        <div class="main-content">
+          <section class="canvas-panel">
+            <div class="canvas-status">
+              <span class="eyebrow">产业结构视图</span>
+              <span id="modeHint">点击节点展开下一级，选择后查看研究卡片</span>
+            </div>
+            <div class="graph-viewport" id="viewport">
+              <div class="graph-world" id="graphWorld">
+                <svg id="edgeLayer" aria-hidden="true"></svg>
+                <div id="nodeLayer"></div>
+              </div>
+            </div>
+
+            <div class="canvas-toolbar">
+              <button id="zoomOut">−</button><span id="zoomValue">100%</span><button id="zoomIn">＋</button>
+              <i></i><button id="fitView">适应视图</button><button id="collapseAll">收起全部</button>
+              <i></i><button id="exportData">导出备份</button><button id="importData">导入</button><button id="resetData">恢复示例</button>
+              <input type="file" id="importFile" accept="application/json,.json" hidden />
+            </div>
+            <div class="legend"><span><i class="legend-dot core"></i>核心环节</span><span><i class="legend-dot segment"></i>产业分支</span><span><i class="legend-dot draft"></i>AI 建议</span></div>
+
+            <div class="review-drawer" id="reviewDrawer">
+              <div class="review-head"><div><span class="spark">✦</span><strong>AI 修改建议</strong><small>每项修改都需要确认，尚未写入正式图谱</small></div><button id="closeReview">×</button></div>
+              <div class="review-summary"><span class="add-pill">+ 2 新节点</span><span class="change-pill">~ 1 处内容</span><span class="link-pill">↗ 1 条关系</span><b id="selectedPatchCount">已选择 4/4</b></div>
+              <div class="patch-list" id="patchList"></div>
+              <div class="review-actions"><button id="rejectBatch">全部拒绝</button><button class="accept" id="acceptBatch">接受所选修改</button></div>
+            </div>
+          </section>
+
+          <aside class="detail-panel" id="detailPanel">
+            <div class="detail-scroll">
+              <div class="detail-head">
+                <div><span class="node-category" id="detailCategory">网络互联 · 核心环节</span><h1 id="detailTitle">光模块</h1></div>
+                <div class="detail-head-actions"><button class="task-add-button" id="addNodeTask" title="加入研究任务">＋任务</button><button class="ai-expand-button" id="expandNodeAi">✦ 继续拆解</button><button class="edit-card-button" id="editCard">编辑卡片</button><button class="more-button" id="nodeMenuToggle">•••</button></div>
+              </div>
+              <div class="dropdown-menu node-dropdown" id="nodeMenu"><button id="addToCompare">⇄ 加入节点对比</button><button id="copyNodeSummary">▣ 复制节点摘要</button><button id="focusNodeAction">◎ 聚焦一跳关系</button><button id="exportNode">⇩ 导出节点 JSON</button><i></i><button class="danger" id="deleteNode">删除节点</button></div>
+              <div class="status-line"><select id="nodeStatus" aria-label="节点研究状态"><option value="unresearched">○ 尚未研究</option><option value="ai">✦ AI 初稿</option><option value="edited">✎ 人工整理</option><option value="evidenced">▤ 已有证据</option><option value="verified">✓ 已核验</option><option value="stale">! 需要更新</option></select><span id="nodeUpdatedAt">尚未更新</span></div>
+
+              <section class="detail-section">
+                <div class="section-label">一句话解释 <button class="mini-ai" data-action="explain">✦ 换个说法</button></div>
+                <p class="lead" id="detailSummary">在交换设备与服务器之间完成电信号和光信号转换，是 AI 集群高速互联的关键器件。</p><div class="claim-citations" data-claim="summary"></div>
+              </section>
+
+              <section class="detail-section insight-card">
+                <div class="section-label">为什么重要</div>
+                <p id="detailWhy">大规模模型训练依赖数千张 GPU 协同工作。算力规模越大，服务器间的数据传输压力越高，高速光连接需求也随之提升。</p><div class="claim-citations" data-claim="why"></div>
+              </section>
+
+              <section class="detail-section">
+                <div class="section-label">研究维度</div>
+                <div class="dimension-grid" id="dimensionGrid"></div>
+              </section>
+
+              <section class="detail-section">
+                <div class="section-label">关键关系 <button class="text-button" id="addRelation">＋ 添加关系</button></div>
+                <div class="relation-list" id="relationList"></div>
+              </section>
+
+              <section class="detail-section sources-section">
+                <div class="section-label">证据与资料 <span class="count" id="sourceCount">0</span><button class="text-button" id="addSource">＋ 添加资料</button></div>
+                <div id="sourceList"></div>
+              </section>
+
+              <section class="detail-section company-node-section">
+                <div class="section-label">相关公司 <span class="count" id="nodeCompanyCount">0</span><button class="text-button" id="openNodeCompanies">查看公司库</button></div>
+                <div id="nodeCompanyList"></div>
+              </section>
+            </div>
+            <div class="ask-box">
+              <div class="node-answer" id="nodeAnswer"><div><span>✦ AI 回答</span><button id="closeAnswer">×</button></div><p id="nodeAnswerText"></p></div>
+              <div class="suggestions"><button data-question="upstream">上游是什么？</button><button data-question="bottleneck">瓶颈在哪里？</button><button data-question="compare">对比相似概念</button></div>
+              <div class="ask-input"><span>✦</span><textarea id="askInput" rows="1" placeholder="继续追问这个环节…"></textarea><button id="askSend">↑</button></div>
+              <small>AI 回答不会自动修改图谱</small>
+            </div>
+          </aside>
+        </div>
+      </main>
+    </div>
+
+    <div class="compare-tray" id="compareTray"><span>节点对比</span><div id="compareChips"></div><button id="clearCompare">清空</button><button class="compare-run" id="openCompare">开始对比</button></div>
+
+    <div class="modal-backdrop" id="editorModal" aria-hidden="true">
+      <form class="editor-dialog" id="researchForm">
+        <div class="editor-header">
+          <div><span>结构化研究卡片</span><h2>编辑节点内容</h2></div>
+          <button type="button" id="closeEditor">×</button>
+        </div>
+        <div class="editor-body">
+          <label class="field"><span>节点名称</span><input id="fieldTitle" required /></label>
+          <label class="field"><span>产业位置</span><input id="fieldCategory" required /></label>
+          <label class="field full"><span>一句话解释</span><textarea id="fieldSummary" rows="3" required></textarea><small>回答“它是什么”，尽量让行业新手可以直接理解。</small></label>
+          <label class="field full"><span>为什么重要</span><textarea id="fieldWhy" rows="4" required></textarea><small>说明它与上下游、性能、成本或供需之间的逻辑。</small></label>
+          <div class="form-divider"><span>研究维度</span><small>这些字段会显示为右侧的快速研究入口</small></div>
+          <label class="field"><span>继续拆解</span><input id="fieldBreakdown" /></label>
+          <label class="field"><span>关键指标</span><input id="fieldMetrics" /></label>
+          <label class="field"><span>主要瓶颈</span><input id="fieldBottleneck" /></label>
+          <label class="field"><span>技术路线 / 趋势</span><input id="fieldRoute" /></label>
+        </div>
+        <div class="editor-footer"><span>保存后自动生成版本快照</span><div><button type="button" id="cancelEditor">取消</button><button class="save-card" type="submit">保存研究卡片</button></div></div>
+      </form>
+    </div>
+
+    <div class="modal-backdrop" id="aiStudioModal" aria-hidden="true">
+      <section class="ai-studio-dialog">
+        <div class="editor-header">
+          <div><span>AI RESEARCH STUDIO</span><h2>让 AI 研究产业，而不是直接改乱图谱</h2></div>
+          <button type="button" id="closeAiStudio">×</button>
+        </div>
+        <div class="ai-tabs">
+          <button class="ai-tab active" data-ai-tab="modify">修改当前图谱</button>
+          <button class="ai-tab" data-ai-tab="create">创建新行业</button>
+        </div>
+        <div class="ai-pane active" data-ai-pane="modify">
+          <div class="ai-context"><span>当前研究对象</span><strong id="aiCurrentProject">AI 算力产业链</strong><small>AI 会读取当前结构和节点内容，只提交差异建议。</small></div>
+          <label class="ai-prompt"><span>你希望 AI 做什么？</span><textarea id="modifyPrompt" rows="5" placeholder="例如：补充光模块的上游环节，检查是否缺少硅光和 CPO，并解释新增关系的依据。"></textarea></label>
+          <div class="ai-options"><label><input type="checkbox" checked /> 新增缺失节点</label><label><input type="checkbox" checked /> 完善节点解释</label><label><input type="checkbox" checked /> 补充产业关系</label><label><input type="checkbox" /> 建议删除重复项</label></div>
+          <div class="ai-callout"><b>安全规则</b><span>AI 只生成补丁，不直接写入。你可以查看每项修改的前后差异，并逐项接受。</span></div>
+          <div class="ai-studio-actions"><button class="secondary" id="useExamplePrompt">使用示例指令</button><button class="run-ai" id="runModifyAi">生成修改建议 <span>→</span></button></div>
+        </div>
+        <div class="ai-pane" data-ai-pane="create">
+          <label class="ai-prompt"><span>要研究哪个行业？</span><input id="industryPrompt" value="光伏行业" placeholder="输入光伏、机器人、创新药等行业" /></label>
+          <div class="generation-grid">
+            <label><span>研究深度</span><select id="generationDepth"><option>快速入门 · 3 层</option><option selected>标准研究 · 4 层</option><option>深度拆解 · 5 层</option></select></label>
+            <label><span>组织方式</span><select><option>产业逻辑优先</option><option>传统上中下游</option><option>技术路线优先</option></select></label>
+          </div>
+          <div class="generation-preview" id="generationPreview">
+            <div><span>预览</span><strong>光伏行业</strong><small>预计生成 13 个核心节点、12 条结构关系</small></div>
+            <div class="preview-chain"><i>上游材料</i><b>→</b><i>电池与组件</i><b>→</b><i>系统与电站</i><b>→</b><i>运营应用</i></div>
+          </div>
+          <div class="ai-callout"><b>创建方式</b><span>生成结果会保存为独立研究项目，不会覆盖当前的 AI 算力产业链。</span></div>
+          <div class="ai-studio-actions"><span class="provider-note" id="providerStatus">当前使用内置演示生成器</span><button class="secondary" id="studioSettings">接口设置</button><button class="run-ai" id="createIndustry">生成并创建项目 <span>→</span></button></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="modal-backdrop" id="aiSettingsModal" aria-hidden="true">
+      <form class="api-settings-dialog" id="apiSettingsForm">
+        <div class="editor-header">
+          <div><span>MODEL PROVIDER</span><h2>AI 接口设置</h2></div>
+          <button type="button" id="closeAiSettings">×</button>
+        </div>
+        <div class="settings-body">
+          <div class="runtime-choice">
+            <label><input type="radio" name="runtimeMode" value="demo" checked /><span><b>演示模式</b><small>不联网，使用内置产业模板</small></span></label>
+            <label><input type="radio" name="runtimeMode" value="api" /><span><b>DeepSeek / 自定义 API</b><small>优先使用你的 DeepSeek 额度</small></span></label>
+          </div>
+          <div class="api-fields" id="apiFields">
+            <label class="field"><span>AI 服务商</span><select id="apiProvider"><option value="deepseek">DeepSeek（推荐）</option><option value="custom">其他 OpenAI 兼容接口</option><option value="openai">OpenAI</option></select></label>
+            <label class="field"><span>接口协议</span><select id="apiProtocol"><option value="responses">OpenAI Responses API</option><option value="chat">OpenAI-compatible Chat Completions</option></select></label>
+            <label class="field full"><span>模型名称</span><input id="apiModel" value="deepseek-v4-flash" placeholder="例如 deepseek-v4-flash" /></label>
+            <label class="field full"><span>Base URL</span><input id="apiBaseUrl" value="https://api.deepseek.com" placeholder="https://api.deepseek.com" /><small id="apiEndpointHint">DeepSeek 会调用 `/chat/completions`；切换其他服务商时可自行修改。</small></label>
+            <label class="field full"><span>API Key</span><div class="secret-input"><input id="apiKey" type="password" autocomplete="off" placeholder="仅保存在当前浏览器会话" /><button type="button" id="toggleApiKey">显示</button></div><small>Key 不写入项目文件和 JSON 备份；关闭浏览器会话后需要重新填写。</small></label>
+            <label class="field"><span>推理强度</span><select id="reasoningEffort"><option value="low">低 · 更快</option><option value="medium" selected>中等 · 平衡</option><option value="high">高 · 深度研究</option></select></label>
+            <label class="field"><span>请求超时</span><select id="apiTimeout"><option value="30000">30 秒</option><option value="60000" selected>60 秒</option><option value="120000">120 秒</option></select></label>
+          </div>
+          <div class="security-warning"><b>个人本地模式</b><span>当前可以直接测试 DeepSeek，但浏览器无法真正隐藏 API Key。正式小程序必须由后端保存密钥并代理模型请求。</span></div>
+          <div class="connection-result" id="connectionResult">尚未测试接口</div>
+        </div>
+        <div class="editor-footer"><button type="button" id="testConnection">测试连接</button><div><button type="button" id="cancelAiSettings">取消</button><button class="save-card" type="submit">保存接口设置</button></div></div>
+      </form>
+    </div>
+
+    <div class="modal-backdrop" id="sourceModal" aria-hidden="true">
+      <form class="compact-dialog" id="sourceForm">
+        <div class="editor-header"><div><span>RESEARCH EVIDENCE</span><h2 id="sourceDialogTitle">添加证据资料</h2></div><button type="button" id="closeSource">×</button></div>
+        <div class="editor-body compact-body">
+          <label class="field"><span>资料类型</span><select id="sourceType"><option value="PDF">PDF / 研报</option><option value="ANNUAL">公司年报</option><option value="NEWS">新闻</option><option value="WEB">网页资料</option></select></label>
+          <label class="field"><span>发布日期</span><input id="sourceDate" type="date" /></label>
+          <label class="field full"><span>资料标题</span><input id="sourceTitle" required placeholder="资料或报告名称" /></label>
+          <label class="field full"><span>URL 或本地文件位置</span><input id="sourceUrl" placeholder="https://… 或文件路径" /></label>
+          <label class="field"><span>原文位置</span><input id="sourceLocation" placeholder="例如：第 28 页、§3.2" /></label>
+          <label class="verify-field"><input id="sourceVerified" type="checkbox" /><span><b>已人工核验</b><small>确认资料确实支持当前节点结论</small></span></label>
+          <label class="field full"><span>原文摘录或研究备注</span><textarea id="sourceQuote" rows="4" placeholder="记录支持这项判断的原文或摘要"></textarea></label>
+        </div>
+        <div class="editor-footer"><span>资料只关联当前节点</span><div><button type="button" id="cancelSource">取消</button><button class="save-card" type="submit">保存资料</button></div></div>
+      </form>
+    </div>
+
+    <div class="modal-backdrop" id="relationModal" aria-hidden="true">
+      <form class="compact-dialog" id="relationForm">
+        <div class="editor-header"><div><span>INDUSTRY RELATION</span><h2>添加产业关系</h2></div><button type="button" id="closeRelation">×</button></div>
+        <div class="editor-body compact-body">
+          <label class="field"><span>起点</span><select id="relationSource"></select></label>
+          <label class="field"><span>终点</span><select id="relationTarget"></select></label>
+          <label class="field"><span>关系类型</span><select id="relationType"><option value="supply">供应</option><option value="depend">依赖</option><option value="constraint">制约</option><option value="substitute">替代</option><option value="benefit">受益</option></select></label>
+          <label class="field"><span>关系标签</span><input id="relationLabel" placeholder="例如：核心供应、产能制约" /></label>
+          <label class="field full"><span>为什么存在这条关系</span><textarea id="relationReason" rows="4" required placeholder="说明关系背后的产业逻辑"></textarea></label>
+        </div>
+        <div class="editor-footer"><span>保存后可在图谱和研究卡片中查看</span><div><button type="button" id="cancelRelation">取消</button><button class="save-card" type="submit">保存关系</button></div></div>
+      </form>
+    </div>
+
+    <div class="modal-backdrop" id="libraryModal" aria-hidden="true">
+      <section class="browser-dialog">
+        <div class="editor-header"><div><span>RESEARCH LIBRARY</span><h2>当前项目资料库</h2></div><button type="button" id="closeLibrary">×</button></div>
+        <div class="library-tabs"><button class="active" id="librarySourcesTab">节点资料</button><button id="libraryFilesTab">文件任务</button></div>
+        <div class="browser-toolbar" id="librarySourceToolbar"><div class="search-wrap"><span>⌕</span><input id="librarySearch" placeholder="搜索资料标题、节点或摘录" /></div><select id="libraryFilter"><option value="all">全部类型</option><option value="PDF">PDF / 研报</option><option value="ANNUAL">公司年报</option><option value="NEWS">新闻</option><option value="WEB">网页资料</option></select></div>
+        <div class="browser-toolbar document-task-toolbar" id="libraryFileToolbar" hidden><span>当前云端项目上传过的 PDF、解析状态和 AI 提取记录</span><button id="refreshDocuments">↻ 刷新任务</button></div>
+        <div class="browser-list" id="libraryList"></div>
+        <div class="browser-footer"><span id="libraryStats"></span><div><button class="secondary-browser-action" id="uploadPdf">⇧ 上传年报 / PDF</button><button id="libraryAddCurrent">＋ 手动添加资料</button></div><input id="pdfFile" type="file" accept="application/pdf,.pdf" hidden /></div>
+      </section>
+    </div>
+
+    <div class="modal-backdrop" id="snapshotsModal" aria-hidden="true">
+      <section class="browser-dialog snapshot-dialog">
+        <div class="editor-header"><div><span>VERSION HISTORY</span><h2>研究快照与修改历史</h2></div><button type="button" id="closeSnapshots">×</button></div>
+        <div class="snapshot-summary"><div><strong id="snapshotCount">0</strong><span>可恢复版本</span></div><p>每次移动、编辑、添加资料、建立关系或接受 AI 建议都会自动生成修改前快照。</p></div>
+        <div class="browser-list" id="snapshotList"></div>
+        <div class="browser-footer"><span>恢复前会保留当前状态，可继续撤销</span><button id="createManualSnapshot">＋ 创建当前快照</button></div>
+      </section>
+    </div>
+
+    <div class="modal-backdrop" id="citationModal" aria-hidden="true">
+      <form class="compact-dialog citation-dialog" id="citationForm">
+        <div class="editor-header"><div><span>CLAIM EVIDENCE</span><h2 id="citationTitle">为结论关联资料</h2></div><button type="button" id="closeCitation">×</button></div>
+        <div class="citation-intro"><strong id="citationClaimText"></strong><p>勾选能够直接支持这条结论的资料。没有合适资料时，可以先添加来源。</p></div>
+        <div class="citation-list" id="citationList"></div>
+        <div class="editor-footer"><button type="button" id="citationAddSource">＋ 添加新资料</button><div><button type="button" id="cancelCitation">取消</button><button class="save-card" type="submit">保存引用关系</button></div></div>
+      </form>
+    </div>
+
+    <div class="modal-backdrop" id="dashboardModal" aria-hidden="true">
+      <section class="browser-dialog dashboard-dialog">
+        <div class="editor-header"><div><span>RESEARCH WORKBOARD</span><h2>项目研究看板</h2></div><button type="button" id="closeDashboard">×</button></div>
+        <div class="dashboard-overview">
+          <div class="dashboard-score"><strong id="projectScore">0%</strong><span>研究完整度</span></div>
+          <div class="dashboard-progress"><div><i id="projectProgressBar"></i></div><p id="projectProgressText"></p></div>
+          <div class="dashboard-stats" id="dashboardStats"></div>
+        </div>
+        <div class="dashboard-toolbar"><div><strong>研究任务</strong><small>从缺口出发，逐项推进，而不是一次性生成整张图</small></div><select id="taskFilter"><option value="all">全部任务</option><option value="todo">待处理</option><option value="doing">进行中</option><option value="done">已完成</option></select><button id="generateTasks">✦ 根据缺口生成任务</button><button id="createTask">＋ 新建任务</button></div>
+        <div class="task-board" id="taskBoard"></div>
+        <div class="coverage-footer"><span>节点研究缺口</span><div id="coverageGaps"></div></div>
+      </section>
+    </div>
+
+    <div class="modal-backdrop" id="companiesModal" aria-hidden="true">
+      <section class="browser-dialog company-dialog">
+        <div class="editor-header"><div><span>COMPANY MAPPING</span><h2>公司与产业节点</h2></div><div class="company-library-actions"><button type="button" id="syncCompanyMaster">云端主档</button><button type="button" id="importCompanies">导入主档</button><button type="button" id="exportCompanies">导出主档</button><button type="button" id="openMappingReview">映射审核 <b id="mappingReviewCount">0</b></button><button type="button" class="primary" id="openCompanyCompare" disabled>公司对比 <b id="companyCompareCount">0</b></button><button type="button" id="closeCompanies">×</button></div></div>
+        <div class="company-workspace">
+          <aside class="company-list-panel"><div class="company-search"><input id="companySearch" placeholder="搜索公司、报告期或业务" /><button id="createCompany">＋</button></div><div id="companyList"></div><div class="company-list-footer" id="companyStats"></div></aside>
+          <section class="company-detail-panel" id="companyDetail"><div class="empty-state">从左侧选择公司，查看年报发现与产业映射</div></section>
+        </div>
+      </section>
+    </div>
+
+    <input type="file" id="companyImportFile" accept="application/json,.json" hidden />
+
+    <div class="modal-backdrop" id="companyCompareModal" aria-hidden="true">
+      <section class="browser-dialog compare-dialog company-compare-dialog">
+        <div class="editor-header"><div><span>COMPANY COMPARISON</span><h2>公司横向对比</h2></div><button type="button" id="closeCompanyCompare">×</button></div>
+        <div class="compare-toolbar"><span>比较业务定位、产业覆盖、多期经营指标与证据完整度</span><button id="copyCompanyComparison">▣ 复制对比摘要</button></div>
+        <div class="comparison-table" id="companyComparisonTable"></div>
+      </section>
+    </div>
+
+    <div class="modal-backdrop" id="mappingReviewModal" aria-hidden="true">
+      <section class="browser-dialog mapping-review-dialog">
+        <div class="editor-header"><div><span>MAPPING REVIEW</span><h2>公司映射批量审核</h2></div><button type="button" id="closeMappingReview">×</button></div>
+        <div class="browser-toolbar mapping-review-toolbar"><label><input type="checkbox" id="selectAllMappings" /> 选择当前结果</label><div class="search-wrap"><span>⌕</span><input id="mappingReviewSearch" placeholder="搜索公司、产业节点或映射理由" /></div></div>
+        <div class="mapping-review-list" id="mappingReviewList"></div>
+        <div class="browser-footer"><span id="mappingReviewStats">尚未选择映射</span><div><button class="secondary-browser-action" id="rejectSelectedMappings">排除选中</button><button id="confirmSelectedMappings">确认选中</button></div></div>
+      </section>
+    </div>
+
+    <div class="modal-backdrop" id="companyEditorModal" aria-hidden="true">
+      <form class="compact-dialog" id="companyForm">
+        <div class="editor-header"><div><span>COMPANY PROFILE</span><h2 id="companyEditorTitle">新增公司档案</h2></div><button type="button" id="closeCompanyEditor">×</button></div>
+        <div class="editor-body compact-body">
+          <label class="field"><span>公司名称</span><input id="companyName" required maxlength="120" /></label>
+          <label class="field"><span>最新报告期</span><input id="companyPeriod" placeholder="例如：2025 年度" maxlength="40" /></label>
+          <label class="field full"><span>公司摘要</span><textarea id="companySummary" rows="4" placeholder="主营业务、核心产品与产业位置"></textarea></label>
+        </div>
+        <div class="editor-footer"><span>手动公司也可以继续上传年报和建立节点映射</span><div><button type="button" id="cancelCompanyEditor">取消</button><button class="save-card" type="submit">保存公司</button></div></div>
+      </form>
+    </div>
+
+    <div class="modal-backdrop" id="taskModal" aria-hidden="true">
+      <form class="compact-dialog" id="taskForm">
+        <div class="editor-header"><div><span>RESEARCH TASK</span><h2 id="taskDialogTitle">新建研究任务</h2></div><button type="button" id="closeTask">×</button></div>
+        <div class="editor-body compact-body">
+          <label class="field full"><span>任务标题</span><input id="taskTitle" required placeholder="例如：核验光模块的核心需求逻辑" /></label>
+          <label class="field"><span>关联节点</span><select id="taskNode"></select></label>
+          <label class="field"><span>任务类型</span><select id="taskType"><option value="structure">产业拆解</option><option value="explain">解释完善</option><option value="evidence">寻找证据</option><option value="verify">人工核验</option><option value="update">信息更新</option></select></label>
+          <label class="field"><span>优先级</span><select id="taskPriority"><option value="high">高</option><option value="medium" selected>中</option><option value="low">低</option></select></label>
+          <label class="field"><span>当前状态</span><select id="taskStatus"><option value="todo">待处理</option><option value="doing">进行中</option><option value="done">已完成</option></select></label>
+          <label class="field full"><span>研究要求</span><textarea id="taskNote" rows="4" placeholder="记录要回答的问题、需要寻找的数据或完成标准"></textarea></label>
+        </div>
+        <div class="editor-footer"><span>任务会随当前项目一起保存</span><div><button type="button" id="cancelTask">取消</button><button class="save-card" type="submit">保存任务</button></div></div>
+      </form>
+    </div>
+
+    <div class="modal-backdrop" id="compareModal" aria-hidden="true">
+      <section class="browser-dialog compare-dialog">
+        <div class="editor-header"><div><span>NODE COMPARISON</span><h2>产业节点对比</h2></div><button type="button" id="closeCompare">×</button></div>
+        <div class="compare-toolbar"><span>并排比较产业含义、研究状态、关键指标、证据与关系</span><button id="copyComparison">▣ 复制对比摘要</button></div>
+        <div class="comparison-table" id="comparisonTable"></div>
+      </section>
+    </div>
+
+    <div class="modal-backdrop" id="reportModal" aria-hidden="true">
+      <section class="browser-dialog report-dialog">
+        <div class="editor-header"><div><span>RESEARCH REPORT</span><h2>项目研究报告</h2></div><button type="button" id="closeReport">×</button></div>
+        <div class="report-toolbar"><label><input type="checkbox" id="reportEvidence" checked /> 包含证据资料</label><label><input type="checkbox" id="reportTasks" checked /> 包含未完成任务</label><label><input type="checkbox" id="reportOnlyExpanded" /> 只导出当前展开分支</label><button id="refreshReport">重新生成</button></div>
+        <pre class="report-preview" id="reportPreview"></pre>
+        <div class="browser-footer"><span id="reportStats"></span><div><button id="copyReport">复制 Markdown</button><button id="downloadReport">下载 .md</button><select id="preciseExportFormat" aria-label="精准导出格式"><option value="docx">Word</option><option value="xlsx">Excel</option><option value="pdf">PDF</option></select><button class="precise-export" id="downloadPreciseReport">精准导出</button></div></div>
+      </section>
+    </div>
+
+    <div class="modal-backdrop" id="cloudModal" aria-hidden="true">
+      <section class="api-settings-dialog cloud-dialog">
+        <div class="editor-header"><div><span>CLOUD WORKSPACE</span><h2>后端连接与云端同步</h2></div><button type="button" id="closeCloud">×</button></div>
+        <div class="settings-body">
+          <div class="cloud-state" id="cloudState"><i></i><span><strong>尚未连接后端</strong><small>先启动本地 FastAPI 服务，再使用开发登录。</small></span></div>
+          <div class="api-fields" id="cloudFields">
+            <label class="field full"><span>后端地址</span><input id="backendUrl" value="http://127.0.0.1:8000" placeholder="http://127.0.0.1:8000" /><small>正式部署后替换为你的 HTTPS API 域名。</small></label>
+            <label class="field"><span>开发登录名称</span><input id="devDisplayName" value="个人研究员" /></label>
+            <label class="field"><span>当前研究空间</span><input id="cloudWorkspaceName" value="尚未登录" disabled /></label>
+          </div>
+          <div class="cloud-actions"><button id="testBackend">检查后端</button><button id="devLogin">开发登录</button><button class="primary-cloud" id="syncProject">同步当前项目</button></div>
+          <div class="connection-result" id="cloudResult">当前项目仍只保存在浏览器本地。</div>
+          <div class="security-warning"><b>当前阶段</b><span>开发登录只用于本机联调。正式产品会替换为微信登录或扫码登录，并由后端统一控制空间权限。</span></div>
+        </div>
+        <div class="editor-footer"><button type="button" id="logoutCloud">退出本地会话</button><div><button class="save-card" type="button" id="closeCloudFooter">完成</button></div></div>
+      </section>
+    </div>
+
+    <div class="modal-backdrop" id="documentModal" aria-hidden="true">
+      <section class="compact-dialog document-dialog">
+        <div class="editor-header"><div><span>DOCUMENT PROCESSING</span><h2>年报与 PDF 解析</h2></div><button type="button" id="closeDocument">×</button></div>
+        <div class="document-progress-body">
+          <div class="document-file"><span>PDF</span><div><strong id="documentName">等待选择文件</strong><small id="documentMeta">文件将上传到当前研究空间</small></div></div>
+          <div class="document-steps" id="documentSteps"><div class="active"><i>1</i><span>上传文件</span></div><div><i>2</i><span>提取页码与文本</span></div><div><i>3</i><span>回填节点资料</span></div></div>
+          <div class="document-bar"><i id="documentBar"></i></div>
+          <p id="documentMessage">准备上传……</p>
+        </div>
+        <div class="editor-footer"><span>当前只支持可复制文本的 PDF；扫描件 OCR 将在下一阶段加入</span><div><button type="button" id="documentExtract" disabled>✦ DeepSeek 提取</button><button type="button" id="documentDone" disabled>完成</button></div></div>
+      </section>
+    </div>
+
+    <div class="modal-backdrop" id="extractionModal" aria-hidden="true">
+      <section class="browser-dialog extraction-dialog">
+        <div class="editor-header"><div><span>ANNUAL REPORT REVIEW</span><h2>年报结构化提取</h2></div><button type="button" id="closeExtraction">×</button></div>
+        <div class="extraction-summary"><div><strong id="extractionCompany">等待 DeepSeek 分析</strong><span id="extractionPeriod"></span></div><p id="extractionSummaryText">模型只会提交带页码和原文摘录的结构化发现。</p><div id="extractionValidation"></div></div>
+        <div class="extraction-filter"><span>选择要写入当前节点的发现</span><select id="extractionCategory"><option value="all">全部类型</option><option value="business">主营业务</option><option value="product">产品与服务</option><option value="financial">经营数据</option><option value="capacity">产能与项目</option><option value="customer">客户与市场</option><option value="industry">产业链位置</option><option value="risk">主要风险</option></select></div>
+        <div class="extraction-list" id="extractionList"><div class="empty-state">正在创建提取任务……</div></div>
+        <div class="browser-footer"><span id="extractionSelected">尚未获得提取结果</span><div><button class="secondary-browser-action" id="retryExtraction">重新提取</button><button id="acceptExtraction" disabled>写入节点资料</button></div></div>
+      </section>
+    </div>
+
+    <div class="modal-backdrop" id="tableModal" aria-hidden="true">
+      <section class="browser-dialog table-dialog">
+        <div class="editor-header"><div><span>ANNUAL REPORT TABLES</span><h2 id="tableDialogTitle">年报表格</h2></div><button type="button" id="closeTables">×</button></div>
+        <div class="table-toolbar"><span id="tableStats">正在读取表格……</span><select id="tableSelector"></select></div>
+        <div class="table-preview-wrap"><table class="table-preview" id="tablePreview"></table></div>
+        <div class="browser-footer"><span>表格结果来自 PDF 版面识别，合并单元格和无框线表格仍需人工核对</span><div><button class="secondary-browser-action" id="attachTableToNode">写入关联节点</button><button id="downloadTableCsv">下载当前表格 CSV</button></div></div>
+      </section>
+    </div>
+
+    <div class="toast" id="toast"></div>
+    <script src="app.js"></script>
+  </body>
+</html>

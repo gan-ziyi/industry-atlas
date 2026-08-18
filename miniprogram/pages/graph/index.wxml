@@ -1,0 +1,13 @@
+<view class="page graph-page" wx:if="{{state}}">
+  <view class="graph-head"><view><text class="eyebrow">INDUSTRY MAP</text><text class="page-title">{{state.projectTitle}}</text><text class="page-subtitle">移动端使用层级视图，快速浏览产业结构和研究状态。</text></view><view class="graph-actions"><button wx:if="{{!readOnly}}" class="ai-edit" bindtap="openAiReview">✦ AI 修改</button><button class="sync {{readOnly?'readonly':''}}" loading="{{syncing}}" disabled="{{readOnly}}" bindtap="sync">{{readOnly?'只读':'同步'}}</button></view></view>
+  <view wx:if="{{readOnly}}" class="readonly-banner">你在当前空间拥有查看者权限。节点、任务和证据均为只读。</view><view wx:if="{{message}}" class="feedback">{{message}}</view>
+  <view class="metrics"><view class="card"><text>{{stats.nodes}}</text><text>产业节点</text></view><view class="card"><text>{{stats.evidence}}</text><text>研究证据</text></view><view class="card company-metric" bindtap="openCompanies"><text>{{stats.companies}}</text><text>关联公司 ›</text></view></view>
+  <view class="search card"><text>⌕</text><input placeholder="搜索节点、解释、指标或瓶颈" value="{{query}}" bindinput="search"/></view>
+  <view class="node-list">
+    <view wx:for="{{rows}}" wx:key="id" class="node-row card" style="margin-left:{{item.indent}}rpx">
+      <view class="status {{item.status}}"></view><view class="node-main" data-id="{{item.id}}" bindtap="openNode"><text class="node-category">{{item.category}}</text><text class="node-title">{{item.title}}</text><text class="node-summary">{{item.summary||'尚未补充研究解释'}}</text><view class="node-meta"><text>{{item.evidenceCount}} 条证据</text><text>{{item.children.length}} 个下级</text></view></view>
+      <button wx:if="{{item.hasChildren}}" class="toggle" data-id="{{item.id}}" catchtap="toggle">{{item.expanded?'−':'+'}}</button><text wx:else class="arrow">›</text>
+    </view>
+  </view>
+  <view wx:if="{{!rows.length}}" class="empty card"><text class="empty-title">没有匹配的产业节点</text><text>换一个关键词试试。</text></view>
+</view>

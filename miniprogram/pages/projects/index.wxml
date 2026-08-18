@@ -1,0 +1,13 @@
+<view class="page project-page">
+  <view class="page-head"><view><text class="eyebrow">CLOUD PROJECTS</text><text class="page-title">研究项目</text><text class="page-subtitle">跨设备继续研究，也可以切换到受邀加入的团队空间。</text></view><view wx:if="{{session.workspace.role!=='viewer'}}" class="create-actions"><button class="create ai-create" loading="{{busy}}" bindtap="createWithAi">✦ AI 新建</button><button class="create primary" disabled="{{busy}}" bindtap="createProject">＋ 新建</button></view></view>
+  <view class="workspace-card card"><text>当前研究空间</text><picker mode="selector" range="{{workspaceNames}}" value="{{workspaceIndex}}" bindchange="switchWorkspace"><view class="workspace-picker"><view><text class="workspace-name">{{session.workspace.name}}</text><text class="workspace-role">{{session.workspace.role==='owner'?'可管理成员与项目':session.workspace.role==='editor'?'可编辑项目':'只读访问'}}</text></view><text>切换 ›</text></view></picker></view>
+  <view wx:if="{{message}}" class="feedback">{{message}}</view>
+  <view wx:if="{{session.workspace.role==='viewer'}}" class="readonly-banner">当前空间为只读权限，你可以查看项目、产业节点与研究任务。</view>
+  <view class="project-list">
+    <view wx:for="{{projects}}" wx:key="id" class="project-card card {{item.id===currentId?'current':''}}">
+      <view class="folder">▣</view><view class="project-info"><text class="project-kicker">{{item.id===currentId?'CURRENT PROJECT':'VERSION '+item.version}}</text><text class="project-title">{{item.title}}</text><text class="project-time">更新于 {{item.updated_at}}</text></view>
+      <view class="project-actions"><button class="secondary" data-id="{{item.id}}" bindtap="openProject">{{item.id===currentId?'重新载入':'打开项目'}}</button><button wx:if="{{session.workspace.role!=='viewer'}}" data-id="{{item.id}}" bindtap="renameProject">改名</button><button wx:if="{{session.workspace.role!=='viewer'}}" class="danger" data-id="{{item.id}}" bindtap="removeProject">删除</button></view>
+    </view>
+  </view>
+  <view wx:if="{{!busy && !projects.length}}" class="empty card"><text class="empty-title">这个空间还没有项目</text><text>{{session.workspace.role==='viewer'?'等待编辑者创建项目':'点击右上角新建第一份产业研究。'}}</text></view>
+</view>
